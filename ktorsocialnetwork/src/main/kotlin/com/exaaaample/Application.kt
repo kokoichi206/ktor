@@ -1,9 +1,11 @@
 package com.exaaaample
 
+import com.exaaaample.di.mainModule
+import com.exaaaample.plugins.*
+import io.ktor.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import com.exaaaample.plugins.*
-import kotlinx.coroutines.GlobalScope
+import org.koin.ktor.ext.Koin
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
@@ -12,6 +14,9 @@ fun main() {
         configureSerialization()
         configureMonitoring()
         configureHTTP()
-        configureSecurity()
+//        configureSecurity()
+        install(Koin) {
+            modules(mainModule)
+        }
     }.start(wait = true)
 }
