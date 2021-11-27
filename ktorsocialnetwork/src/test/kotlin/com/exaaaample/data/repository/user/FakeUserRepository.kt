@@ -1,4 +1,4 @@
-package com.exaaaample.repository.user
+package com.exaaaample.data.repository.user
 
 import com.exaaaample.data.models.User
 
@@ -16,5 +16,10 @@ class FakeUserRepository : UserRepository {
 
     override suspend fun getUserByEmail(email: String): User? {
         return users.find { it.email == email }
+    }
+
+    override suspend fun doesPasswordForUserMatch(email: String, enteredPassword: String): Boolean {
+        val user = getUserByEmail(email)
+        return user?.password == enteredPassword
     }
 }

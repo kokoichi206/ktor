@@ -9,14 +9,14 @@ import org.koin.ktor.ext.Koin
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+        install(Koin) {
+            modules(mainModule)
+        }
         configureRouting()
         configureSockets()
         configureSerialization()
         configureMonitoring()
         configureHTTP()
 //        configureSecurity()
-        install(Koin) {
-            modules(mainModule)
-        }
     }.start(wait = true)
 }

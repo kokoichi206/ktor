@@ -1,4 +1,4 @@
-package com.exaaaample.repository.user
+package com.exaaaample.data.repository.user
 
 import com.exaaaample.data.models.User
 
@@ -9,4 +9,6 @@ interface UserRepository {
     suspend fun getUserById(id: String): User?
 
     suspend fun getUserByEmail(email: String): User?
+
+    suspend fun doesPasswordForUserMatch(email: String, enteredPassword: String): Boolean
 }

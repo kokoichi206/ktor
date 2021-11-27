@@ -1,7 +1,8 @@
 package com.exaaaample.plugins
 
-import com.exaaaample.repository.user.UserRepository
+import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.routes.createUserRoute
+import com.exaaaample.routes.loginUser
 import io.ktor.routing.*
 import io.ktor.http.content.*
 import io.ktor.application.*
@@ -12,6 +13,8 @@ fun Application.configureRouting() {
     val userRepository: UserRepository by inject()
     routing {
         createUserRoute(userRepository)
+        loginUser(userRepository)
+
         get("/") {
                 call.respondText("Hello World!")
             }

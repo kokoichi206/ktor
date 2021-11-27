@@ -5,7 +5,7 @@ import com.exaaaample.data.requests.CreateAccountRequest
 import com.exaaaample.data.responses.BasicApiResponse
 import com.exaaaample.di.testModule
 import com.exaaaample.plugins.configureSerialization
-import com.exaaaample.repository.user.FakeUserRepository
+import com.exaaaample.data.repository.user.FakeUserRepository
 import com.exaaaample.util.ApiResponseMessages
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.Gson
@@ -13,13 +13,13 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.routing.*
 import io.ktor.server.testing.*
-import io.netty.handler.codec.http.HttpHeaders
-import io.netty.handler.codec.http.HttpHeaders.addHeader
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 
@@ -34,6 +34,11 @@ internal class CreateUserRouteTest : KoinTest {
         startKoin {
             modules(testModule)
         }
+    }
+
+    @AfterTest
+    fun tearDown() {
+        stopKoin()
     }
 
     @Test

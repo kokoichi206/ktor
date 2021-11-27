@@ -1,7 +1,7 @@
 package com.exaaaample.di
 
-import com.exaaaample.repository.user.UserRepository
-import com.exaaaample.repository.user.UserRepositoryImpl
+import com.exaaaample.data.repository.user.UserRepository
+import com.exaaaample.data.repository.user.UserRepositoryImpl
 import com.exaaaample.util.Constants
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine

@@ -7,4 +7,10 @@
 - [KMongo](https://litote.org/kmongo/)
     - Kotlin toolkit for Mongo
 
+## Memo
 
+### Request
+```sh
+$ curl -X POST -H "Content-Type: application/json" -d "{'email':'test@test.com', 'username':'test','password':'test'}" localhost:8080/api/user/create
+$ curl -X POST -H "Content-Type: application/json" -d "{'email':'test@test.com', 'username':'test','password':'test'}" localhost:8080/api/user/login
+```

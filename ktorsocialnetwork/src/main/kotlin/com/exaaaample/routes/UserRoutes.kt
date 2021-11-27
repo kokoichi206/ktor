@@ -1,10 +1,13 @@
 package com.exaaaample.routes
 
-import com.exaaaample.repository.user.UserRepository
+import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.data.models.User
 import com.exaaaample.data.requests.CreateAccountRequest
+import com.exaaaample.data.requests.LoginRequest
 import com.exaaaample.data.responses.BasicApiResponse
+import com.exaaaample.util.ApiResponseMessages
 import com.exaaaample.util.ApiResponseMessages.FIELDS_BLANK
+import com.exaaaample.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.exaaaample.util.ApiResponseMessages.USER_ALREADY_EXISTS
 import io.ktor.application.*
 import io.ktor.http.*
@@ -52,6 +55,42 @@ fun Route.createUserRoute(userRepository: UserRepository) {
             )
             call.respond(
                 BasicApiResponse(successful = true)
+            )
+        }
+    }
+}
+
+fun Route.loginUser(userRepository: UserRepository) {
+
+    post("/api/user/login") {
+        val request = call.receiveOrNull<LoginRequest>() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        if (request.email.isBlank() || request.password.isBlank()) {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val isCorrectPassword = userRepository.doesPasswordForUserMatch(
+            email = request.email,
+            enteredPassword = request.password
+        )
+        if(isCorrectPassword) {
+            call.respond(
+                HttpStatusCode.OK,
+                BasicApiResponse(
+                    successful = true
+                )
+            )
+        } else {
+            call.respond(
+                HttpStatusCode.OK,
+                BasicApiResponse(
+                    successful = false,
+                    message = INVALID_CREDENTIALS
+                )
             )
         }
     }
