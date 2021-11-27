@@ -1,10 +1,9 @@
 package com.exaaaample.routes
 
-import com.exaaaample.controller.user.UserController
+import com.exaaaample.repository.user.UserRepository
 import com.exaaaample.data.models.User
 import com.exaaaample.data.requests.CreateAccountRequest
 import com.exaaaample.data.responses.BasicApiResponse
-import com.exaaaample.util.ApiResponseMessages
 import com.exaaaample.util.ApiResponseMessages.FIELDS_BLANK
 import com.exaaaample.util.ApiResponseMessages.USER_ALREADY_EXISTS
 import io.ktor.application.*
@@ -12,17 +11,15 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import org.koin.ktor.ext.inject
 
-fun Route.userRoutes() {
-    val userController: UserController by inject()
+fun Route.createUserRoute(userRepository: UserRepository) {
     route("/api/user/create") {
         post {
             val request = call.receiveOrNull<CreateAccountRequest>() ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val userExists = userController.getUserByEmail(request.email) != null
+            val userExists = userRepository.getUserByEmail(request.email) != null
             if (userExists) {
                 call.respond(
                     BasicApiResponse(
@@ -41,7 +38,7 @@ fun Route.userRoutes() {
                 )
                 return@post
             }
-            userController.createUser(
+            userRepository.createUser(
                 User(
                     email = request.email,
                     username = request.username,

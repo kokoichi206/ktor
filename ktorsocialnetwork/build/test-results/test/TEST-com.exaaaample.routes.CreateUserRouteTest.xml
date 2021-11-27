@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.exaaaample.routes.CreateUserRouteTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-11-27T16:48:33" hostname="TakahironoMacBook-Pro.local" time="1.607">
+  <properties/>
+  <testcase name="Create user, valid data, responds with successful" classname="com.exaaaample.routes.CreateUserRouteTest" time="1.607"/>
+  <system-out><![CDATA[2021-11-28 01:48:33.810 [Test worker @coroutine#1] INFO  ktor.test - Autoreload is disabled because the development mode is off.
+2021-11-28 01:48:33.821 [Test worker @coroutine#1] INFO  ktor.test - Application started in 0.107 seconds.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
