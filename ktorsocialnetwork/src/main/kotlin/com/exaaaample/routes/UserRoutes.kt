@@ -1,11 +1,10 @@
 package com.exaaaample.routes
 
 import com.exaaaample.data.repository.user.UserRepository
-import com.exaaaample.data.models.User
 import com.exaaaample.data.requests.CreateAccountRequest
 import com.exaaaample.data.requests.LoginRequest
 import com.exaaaample.data.responses.BasicApiResponse
-import com.exaaaample.util.ApiResponseMessages
+import com.exaaaample.service.UserService
 import com.exaaaample.util.ApiResponseMessages.FIELDS_BLANK
 import com.exaaaample.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.exaaaample.util.ApiResponseMessages.USER_ALREADY_EXISTS
@@ -15,15 +14,14 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Route.createUserRoute(userRepository: UserRepository) {
+fun Route.createUserRoute(userService: UserService) {
     route("/api/user/create") {
         post {
             val request = call.receiveOrNull<CreateAccountRequest>() ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val userExists = userRepository.getUserByEmail(request.email) != null
-            if (userExists) {
+            if (userService.doesUserWithEmailExist(request.email)) {
                 call.respond(
                     BasicApiResponse(
                         successful = false,
@@ -32,35 +30,28 @@ fun Route.createUserRoute(userRepository: UserRepository) {
                 )
                 return@post
             }
-            if (request.email.isBlank() || request.password.isBlank() || request.username.isBlank()) {
-                call.respond(
-                    BasicApiResponse(
-                        successful = false,
-                        message = FIELDS_BLANK
+            when (userService.validateCreateAccountRequest(request)) {
+                is UserService.ValidationEvent.ErrorFieldEmpty -> {
+                    call.respond(
+                        BasicApiResponse(
+                            successful = false,
+                            message = FIELDS_BLANK
+                        )
                     )
-                )
-                return@post
+                    return@post
+                }
+                is UserService.ValidationEvent.Success -> {
+                    userService.createUser(request)
+                    call.respond(
+                        BasicApiResponse(successful = true)
+                    )
+                }
             }
-            userRepository.createUser(
-                User(
-                    email = request.email,
-                    username = request.username,
-                    password = request.password,
-                    profileImageUrl = "",
-                    bio = "",
-                    gitHubUrl = null,
-                    instagramUrl = null,
-                    linkedInUrl = null
-                )
-            )
-            call.respond(
-                BasicApiResponse(successful = true)
-            )
         }
     }
 }
 
-fun Route.loginUser(userRepository: UserRepository) {
+fun Route.loginUser(userService: UserService) {
 
     post("/api/user/login") {
         val request = call.receiveOrNull<LoginRequest>() ?: kotlin.run {
@@ -73,11 +64,8 @@ fun Route.loginUser(userRepository: UserRepository) {
             return@post
         }
 
-        val isCorrectPassword = userRepository.doesPasswordForUserMatch(
-            email = request.email,
-            enteredPassword = request.password
-        )
-        if(isCorrectPassword) {
+        val isCorrectPassword = userService.doesPasswordForUserMatch(request)
+        if (isCorrectPassword) {
             call.respond(
                 HttpStatusCode.OK,
                 BasicApiResponse(

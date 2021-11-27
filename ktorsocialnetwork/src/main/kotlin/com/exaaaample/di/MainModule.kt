@@ -6,6 +6,9 @@ import com.exaaaample.data.repository.post.PostRepository
 import com.exaaaample.data.repository.post.PostRepositoryImpl
 import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.data.repository.user.UserRepositoryImpl
+import com.exaaaample.service.FollowService
+import com.exaaaample.service.PostService
+import com.exaaaample.service.UserService
 import com.exaaaample.util.Constants
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
@@ -26,4 +29,7 @@ val mainModule = module {
     single<PostRepository?> {
         PostRepositoryImpl(get())
     }
+    single { UserService(get()) }
+    single { FollowService(get()) }
+    single { PostService(get()) }
 }
