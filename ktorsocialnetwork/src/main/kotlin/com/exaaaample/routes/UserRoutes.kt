@@ -73,14 +73,27 @@ fun Route.loginUser(
             return@post
         }
 
-        val isCorrectPassword = userService.doesPasswordForUserMatch(request)
+        val user = userService.getUserByEmail(request.email)?: kotlin.run {
+            call.respond(
+                HttpStatusCode.OK,
+                BasicApiResponse(
+                    successful = false,
+                    message = INVALID_CREDENTIALS
+                )
+            )
+            return@post
+        }
+        val isCorrectPassword = userService.isValidPassword(
+            enteredPassword = request.password,
+            actualPassword = user.password
+        )
         if (isCorrectPassword) {
 
             // ------------------------------------
             // Create JWT
             val expiresIn = 1000L * 60L * 60L * 24L * 365L // 1 year
             val token = JWT.create()
-                .withClaim("email", request.email)  // Extra data ?
+                .withClaim("userId", user.id)  // Extra data ?
                 .withIssuer(jwtIssuer)
                 .withExpiresAt(Date(System.currentTimeMillis() + expiresIn))
                 .withAudience(jwtAudience)
