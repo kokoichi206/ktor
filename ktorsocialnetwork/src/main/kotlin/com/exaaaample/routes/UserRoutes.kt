@@ -1,8 +1,11 @@
 package com.exaaaample.routes
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.data.requests.CreateAccountRequest
 import com.exaaaample.data.requests.LoginRequest
+import com.exaaaample.data.responses.AuthResponse
 import com.exaaaample.data.responses.BasicApiResponse
 import com.exaaaample.service.UserService
 import com.exaaaample.util.ApiResponseMessages.FIELDS_BLANK
@@ -13,6 +16,7 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import java.util.*
 
 fun Route.createUserRoute(userService: UserService) {
     route("/api/user/create") {
@@ -51,7 +55,12 @@ fun Route.createUserRoute(userService: UserService) {
     }
 }
 
-fun Route.loginUser(userService: UserService) {
+fun Route.loginUser(
+    userService: UserService,
+    jwtIssuer: String,
+    jwtAudience: String,
+    jwtSecret: String,
+) {
 
     post("/api/user/login") {
         val request = call.receiveOrNull<LoginRequest>() ?: kotlin.run {
@@ -66,11 +75,19 @@ fun Route.loginUser(userService: UserService) {
 
         val isCorrectPassword = userService.doesPasswordForUserMatch(request)
         if (isCorrectPassword) {
+
+            // ------------------------------------
+            // Create JWT
+            val expiresIn = 1000L * 60L * 60L * 24L * 365L // 1 year
+            val token = JWT.create()
+                .withClaim("email", request.email)  // Extra data ?
+                .withIssuer(jwtIssuer)
+                .withExpiresAt(Date(System.currentTimeMillis() + expiresIn))
+                .withAudience()
+                .sign(Algorithm.HMAC256(jwtSecret))
             call.respond(
                 HttpStatusCode.OK,
-                BasicApiResponse(
-                    successful = true
-                )
+                AuthResponse(token = token)
             )
         } else {
             call.respond(
