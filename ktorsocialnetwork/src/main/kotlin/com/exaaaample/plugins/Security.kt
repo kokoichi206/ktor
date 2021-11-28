@@ -11,7 +11,7 @@ import io.ktor.response.*
 import io.ktor.request.*
 
 fun Application.configureSecurity() {
-    
+
     authentication {
             jwt {
                 val jwtAudience = environment.config.property("jwt.audience").getString()
@@ -32,3 +32,6 @@ fun Application.configureSecurity() {
         }
 
 }
+
+val JWTPrincipal.email: String?
+    get() = getClaim("email", String::class)
