@@ -7,11 +7,14 @@ import com.exaaaample.data.requests.CreateAccountRequest
 import com.exaaaample.data.requests.LoginRequest
 import com.exaaaample.data.responses.AuthResponse
 import com.exaaaample.data.responses.BasicApiResponse
+import com.exaaaample.data.responses.UserResponseItem
 import com.exaaaample.service.UserService
 import com.exaaaample.util.ApiResponseMessages.FIELDS_BLANK
 import com.exaaaample.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.exaaaample.util.ApiResponseMessages.USER_ALREADY_EXISTS
+import com.exaaaample.util.QueryParams
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -73,7 +76,7 @@ fun Route.loginUser(
             return@post
         }
 
-        val user = userService.getUserByEmail(request.email)?: kotlin.run {
+        val user = userService.getUserByEmail(request.email) ?: kotlin.run {
             call.respond(
                 HttpStatusCode.OK,
                 BasicApiResponse(
@@ -109,6 +112,26 @@ fun Route.loginUser(
                     successful = false,
                     message = INVALID_CREDENTIALS
                 )
+            )
+        }
+    }
+}
+
+fun Route.searchUser(userService: UserService) {
+    authenticate {
+        get {
+            val query = call.parameters[QueryParams.PARAM_QUERY]
+            if (query == null || query.isBlank()) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    listOf<UserResponseItem>()
+                )
+                return@get
+            }
+            val searchResults = userService.searchForUsers(query, call.userId)
+            call.respond(
+                HttpStatusCode.OK,
+                searchResults
             )
         }
     }
