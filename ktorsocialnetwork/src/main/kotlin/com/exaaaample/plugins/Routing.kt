@@ -36,7 +36,7 @@ fun Application.configureRouting() {
         unfollowUser(followService)
 
         // Post routes
-        createPostRoute(postService)
+        createPostRoute(postService, userService)
 
         get("/") {
                 call.respondText("Hello World!")

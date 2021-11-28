@@ -4,10 +4,6 @@ import com.exaaaample.data.models.User
 import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.data.requests.CreateAccountRequest
 import com.exaaaample.data.requests.LoginRequest
-import com.exaaaample.data.responses.BasicApiResponse
-import com.exaaaample.util.ApiResponseMessages
-import io.ktor.application.*
-import io.ktor.response.*
 
 class UserService(
     private val repository: UserRepository
@@ -37,6 +33,10 @@ class UserService(
             return ValidationEvent.ErrorFieldEmpty
         }
         return ValidationEvent.Success
+    }
+
+    suspend fun doesEmailBelongToUserId(email: String, userId: String): Boolean {
+        return repository.doesEmailBelongToUserId(email, userId)
     }
 
     suspend fun doesPasswordForUserMatch(request: LoginRequest): Boolean {
