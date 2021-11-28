@@ -2,11 +2,14 @@ package com.exaaaample.di
 
 import com.exaaaample.data.repository.follow.FollowRepository
 import com.exaaaample.data.repository.follow.FollowRepositoryImpl
+import com.exaaaample.data.repository.likes.LikesRepository
+import com.exaaaample.data.repository.likes.LikesRepositoryImpl
 import com.exaaaample.data.repository.post.PostRepository
 import com.exaaaample.data.repository.post.PostRepositoryImpl
 import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.data.repository.user.UserRepositoryImpl
 import com.exaaaample.service.FollowService
+import com.exaaaample.service.LikeService
 import com.exaaaample.service.PostService
 import com.exaaaample.service.UserService
 import com.exaaaample.util.Constants
@@ -29,7 +32,11 @@ val mainModule = module {
     single<PostRepository?> {
         PostRepositoryImpl(get())
     }
+    single<LikesRepository?> {
+        LikesRepositoryImpl(get())
+    }
     single { UserService(get()) }
     single { FollowService(get()) }
     single { PostService(get()) }
+    single { LikeService(get()) }
 }

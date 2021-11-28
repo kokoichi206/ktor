@@ -4,6 +4,7 @@ import com.exaaaample.data.requests.CreatePostRequest
 import com.exaaaample.data.requests.DeletePostRequest
 import com.exaaaample.data.responses.BasicApiResponse
 import com.exaaaample.plugins.email
+import com.exaaaample.service.LikeService
 import com.exaaaample.service.PostService
 import com.exaaaample.service.UserService
 import com.exaaaample.util.ApiResponseMessages
@@ -17,7 +18,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Route.createPostRoute(
+fun Route.createPost(
     postService: PostService,
     userService: UserService,
 ) {
@@ -84,7 +85,8 @@ fun Route.getPostsForFollows(
 
 fun Route.deletePost(
     postService: PostService,
-    userService: UserService
+    userService: UserService,
+    likeService: LikeService,
 ) {
     delete("/api/post/delete") {
         val request = call.receiveOrNull<DeletePostRequest>() ?: kotlin.run {
@@ -103,6 +105,8 @@ fun Route.deletePost(
             validateEmail = userService::doesEmailBelongToUserId
         ) {
             postService.deletePost(request.postId)
+            likeService.deleteLikesForParent(request.postId)
+            // TODO: Delete comments from post
             call.respond(HttpStatusCode.OK)
         }
     }

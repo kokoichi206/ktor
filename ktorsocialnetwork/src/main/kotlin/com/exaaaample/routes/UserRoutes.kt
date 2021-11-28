@@ -18,7 +18,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import java.util.*
 
-fun Route.createUserRoute(userService: UserService) {
+fun Route.createUser(userService: UserService) {
     route("/api/user/create") {
         post {
             val request = call.receiveOrNull<CreateAccountRequest>() ?: kotlin.run {
