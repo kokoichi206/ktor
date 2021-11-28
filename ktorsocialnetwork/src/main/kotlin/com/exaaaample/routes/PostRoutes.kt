@@ -1,6 +1,7 @@
 package com.exaaaample.routes
 
 import com.exaaaample.data.requests.CreatePostRequest
+import com.exaaaample.data.requests.DeletePostRequest
 import com.exaaaample.data.responses.BasicApiResponse
 import com.exaaaample.plugins.email
 import com.exaaaample.service.PostService
@@ -77,6 +78,32 @@ fun Route.getPostsForFollows(
                     posts
                 )
             }
+        }
+    }
+}
+
+fun Route.deletePost(
+    postService: PostService,
+    userService: UserService
+) {
+    delete("/api/post/delete") {
+        val request = call.receiveOrNull<DeletePostRequest>() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@delete
+        }
+
+        val post = postService.getPost(request.postId)
+        if(post == null) {
+            call.respond(HttpStatusCode.NotFound)
+            return@delete
+        }
+
+        ifEmailBelongsToUser(
+            userId = post.userId,
+            validateEmail = userService::doesEmailBelongToUserId
+        ) {
+            postService.deletePost(request.postId)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }
