@@ -2,6 +2,8 @@ package com.exaaaample.routes
 
 import com.exaaaample.data.requests.LikeUpdateRequest
 import com.exaaaample.data.responses.BasicApiResponse
+import com.exaaaample.data.util.ParentType
+import com.exaaaample.service.ActivityService
 import com.exaaaample.service.LikeService
 import com.exaaaample.service.UserService
 import com.exaaaample.util.ApiResponseMessages
@@ -14,7 +16,7 @@ import io.ktor.routing.*
 
 fun Route.likeParent(
     likeService: LikeService,
-    userService: UserService,
+    activityService: ActivityService
 ) {
     authenticate {
         post("/api/like") {
@@ -22,8 +24,15 @@ fun Route.likeParent(
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val likeSuccessful = likeService.likeParent(call.userId, request.parentId)
-            if(likeSuccessful) {
+
+            val userId = call.userId
+            val likeSuccessful = likeService.likeParent(userId, request.parentId, request.parentType)
+            if (likeSuccessful) {
+                activityService.addLikeActivity(
+                    byUserId = userId,
+                    parentType = ParentType.fromType(request.parentType),
+                    parentId = request.parentId
+                )
                 call.respond(
                     HttpStatusCode.OK,
                     BasicApiResponse(
@@ -54,7 +63,7 @@ fun Route.unlikeParent(
                 return@delete
             }
             val unlikeSuccessful = likeService.unlikeParent(call.userId, request.parentId)
-            if(unlikeSuccessful) {
+            if (unlikeSuccessful) {
                 call.respond(
                     HttpStatusCode.OK,
                     BasicApiResponse(

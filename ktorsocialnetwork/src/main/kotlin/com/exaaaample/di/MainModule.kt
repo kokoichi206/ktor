@@ -1,5 +1,7 @@
 package com.exaaaample.di
 
+import com.exaaaample.data.repository.activity.ActivityRepository
+import com.exaaaample.data.repository.activity.ActivityRepositoryImpl
 import com.exaaaample.data.repository.comment.CommentRepository
 import com.exaaaample.data.repository.comment.CommentRepositoryImpl
 import com.exaaaample.data.repository.follow.FollowRepository
@@ -37,9 +39,13 @@ val mainModule = module {
     single<CommentRepository?> {
         CommentRepositoryImpl(get())
     }
+    single<ActivityRepository?> {
+        ActivityRepositoryImpl(get())
+    }
     single { UserService(get()) }
     single { FollowService(get()) }
     single { PostService(get()) }
     single { LikeService(get()) }
     single { CommentService(get()) }
+    single { ActivityService(get(), get(), get()) }
 }
