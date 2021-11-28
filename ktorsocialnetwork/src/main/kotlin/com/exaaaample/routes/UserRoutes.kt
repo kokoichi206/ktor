@@ -83,7 +83,7 @@ fun Route.loginUser(
                 .withClaim("email", request.email)  // Extra data ?
                 .withIssuer(jwtIssuer)
                 .withExpiresAt(Date(System.currentTimeMillis() + expiresIn))
-                .withAudience()
+                .withAudience(jwtAudience)
                 .sign(Algorithm.HMAC256(jwtSecret))
             call.respond(
                 HttpStatusCode.OK,
