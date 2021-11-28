@@ -1,10 +1,7 @@
 package com.exaaaample.plugins
 
 import com.exaaaample.routes.*
-import com.exaaaample.service.FollowService
-import com.exaaaample.service.LikeService
-import com.exaaaample.service.PostService
-import com.exaaaample.service.UserService
+import com.exaaaample.service.*
 import io.ktor.routing.*
 import io.ktor.http.content.*
 import io.ktor.application.*
@@ -16,6 +13,7 @@ fun Application.configureRouting() {
     val followService: FollowService by inject()
     val postService: PostService by inject()
     val likeService: LikeService by inject()
+    val commentService: CommentService by inject()
 
     val jwtIssuer = environment.config.property("jwt.domain").getString()
     val jwtAudience = environment.config.property("jwt.audience").getString()
@@ -41,6 +39,12 @@ fun Application.configureRouting() {
 
         // Like routes
         likeParent(likeService, userService)
+        unlikeParent(likeService, userService)
+
+        // Comment routes
+        createComment(commentService, userService)
+        deleteComment(commentService, userService, likeService)
+        getCommentsForPost(commentService)
 
         get("/") {
                 call.respondText("Hello World!")
