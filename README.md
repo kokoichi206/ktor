@@ -27,7 +27,7 @@ curl -f -X POST -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e
 
 ``` sh
 # Follow
-curl -f -X POST -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJtYWluIiwiaXNzIjoiaHR0cDovLzAuMC4wLjA6ODAwMSIsImV4cCI6MTY2OTYyNDcxNiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIn0.2plW-z21m2cIkVJOa4DKip0CRYFLoSIdV91t8ih4KaE' -H "Content-Type: application/json" -d "{'followingUserId':'61a246883eee374e403451a7', 'followedUserId':'61a317bf211c770cb30e451d'}" localhost:8001/api/following/follow
+curl -f -X POST -H 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJtYWluIiwiaXNzIjoiaHR0cDovLzAuMC4wLjA6ODAwMSIsImV4cCI6MTY2OTcyMjY0MCwidXNlcklkIjoiNjFhMzE3YmYyMTFjNzcwY2IzMGU0NTFkIn0.bzH938IzPaIQ7ZfqBQc1KwjudlIB4UJ5QoulBcXQYwM' -H "Content-Type: application/json" -d "{'followingUserId':'61a246883eee374e403451a7', 'followedUserId':'61a317bf211c770cb30e451d'}" localhost:8001/api/following/follow
 ```
 
 ```sh
@@ -37,6 +37,19 @@ curl -f -X GET -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.ey
 # Comment
 curl -f -X POST -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJtYWluIiwiaXNzIjoiaHR0cDovLzAuMC4wLjA6ODAwMSIsImV4cCI6MTY2OTYyNDcxNiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIn0.2plW-z21m2cIkVJOa4DKip0CRYFLoSIdV91t8ih4KaE' -H "Content-Type: application/json" -d "{'comment':'Hello world, this is a test comment', 'postId':'61a31e547272f465eb6f0f19', 'userId':'61a246883eee374e403451a7'}" localhost:8001/api/comment/create
 ```
+
+``` sh
+# upload file
+curl -f -X POST 'localhost:8001/api/user/profile' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJtYWluIiwiaXNzIjoiaHR0cDovLzAuMC4wLjA6ODAwMSIsImV4cCI6MTY2OTcyMjY0MCwidXNlcklkIjoiNjFhMzE3YmYyMTFjNzcwY2IzMGU0NTFkIn0.bzH938IzPaIQ7ZfqBQc1KwjudlIB4UJ5QoulBcXQYwM' -F img=@./QR_062506.png
+## below request, the server path is regarded as a file name, so returns 404
+curl -f -X POST  -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJtYWluIiwiaXNzIjoiaHR0cDovLzAuMC4wLjA6ODAwMSIsImV4cCI6MTY2OTcyMjY0MCwidXNlcklkIjoiNjFhMzE3YmYyMTFjNzcwY2IzMGU0NTFkIn0.bzH938IzPaIQ7ZfqBQc1KwjudlIB4UJ5QoulBcXQYwM' -d "{'update_profile_data':{'username': 'token', 'bio': 'Today is a nice day', 'skills' []}" -F img=@./QR_062506.png localhost:8001/api/user/profile
+# Warning: You can only select one HTTP request method! You asked for both POST
+# Warning: (-d, --data) and multipart formpost (-F, --form).
+
+curl -f -X PUT 'localhost:8001/api/user/profile' -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJtYWluIiwiaXNzIjoiaHR0cDovLzAuMC4wLjA6ODAwMSIsImV4cCI6MTY2OTcyMjY0MCwidXNlcklkIjoiNjFhMzE3YmYyMTFjNzcwY2IzMGU0NTFkIn0.bzH938IzPaIQ7ZfqBQc1KwjudlIB4UJ5QoulBcXQYwM' -F "update_profile_data"="{'username': 'token', 'bio': 'Today is a nice day', 'skills': []}" -F img=@./QR_062506.png
+```
+
+
 
 ### curl memo
 - -f オプションで、エラーの時も軽く表示してくれる

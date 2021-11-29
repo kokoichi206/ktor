@@ -7,6 +7,7 @@ import io.ktor.http.content.*
 import io.ktor.application.*
 import io.ktor.response.*
 import org.koin.ktor.ext.inject
+import java.io.File
 
 fun Application.configureRouting() {
     val userService: UserService by inject()
@@ -31,6 +32,7 @@ fun Application.configureRouting() {
         searchUser(userService)
         getUserProfile(userService)
         getPostsForProfile(postService)
+        updateUserProfile(userService)
 
         // Following routes
         followUser(followService, activityService)
@@ -57,7 +59,7 @@ fun Application.configureRouting() {
                 call.respondText("Hello World!")
             }
         // Static plugin. Try to access `/static/index.html`
-        static("/static") {
+        static {
             resources("static")
         }
     }

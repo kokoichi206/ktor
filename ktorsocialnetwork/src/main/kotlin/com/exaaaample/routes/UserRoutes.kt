@@ -17,12 +17,16 @@ import com.exaaaample.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.exaaaample.util.ApiResponseMessages.USER_ALREADY_EXISTS
 import com.exaaaample.util.Constants
 import com.exaaaample.util.QueryParams
+import com.google.gson.Gson
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import org.koin.ktor.ext.inject
+import java.io.File
 import java.util.*
 
 fun Route.createUser(userService: UserService) {
@@ -190,9 +194,56 @@ fun Route.getUserProfile(userService: UserService) {
 }
 
 fun Route.updateUserProfile(userService: UserService) {
+    val gson: Gson by inject()
     authenticate {
         put("/api/user/profile") {
-            val request = call.receiveOrNull<UpdateProfileRequest>() ?: kotlin.run {
+//            val request = call.receiveOrNull<UpdateProfileRequest>() ?: kotlin.run {
+//                call.respond(HttpStatusCode.BadRequest)
+//                return@put
+//            }
+            val multipart = call.receiveMultipart()
+            var updateProfileRequest: UpdateProfileRequest? = null
+            var fileName: String? = null
+            multipart.forEachPart { partData ->
+                when (partData) {
+                    is PartData.FormItem -> {
+                        if (partData.name == "update_profile_data") {
+                            updateProfileRequest = gson.fromJson(
+                                partData.value,
+                                UpdateProfileRequest::class.java
+                            )
+                        }
+                    }
+                    is PartData.FileItem -> {
+                        val fileBytes = partData.streamProvider().readBytes()
+                        val fileExtension = partData.originalFileName?.takeLastWhile { it != '.' }
+                        fileName = UUID.randomUUID().toString() + "." + fileExtension
+                        File("${Constants.PROFILE_PICTURE_PATH}${fileName}").writeBytes(fileBytes)
+                    }
+                    is PartData.BinaryItem -> Unit
+                }
+            }
+
+            updateProfileRequest?.let { request ->
+//                val profilePictureUrl = "${Constants.BASE_URL}src/main/${Constants.PROFILE_PICTURE_PATH}$fileName"
+                val profilePictureUrl = "${Constants.BASE_URL}profile_pictures/$fileName"
+                val updateAcknowledged = userService.updateUser(
+                    userId = call.userId,
+                    profileImageUrl = profilePictureUrl,
+                    updateProfileRequest = request
+                )
+                if (updateAcknowledged) {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        BasicApiResponse(
+                            successful = true
+                        )
+                    )
+                } else {
+                    File("${Constants.PROFILE_PICTURE_PATH}/$fileName").delete()
+                    call.respond(HttpStatusCode.InternalServerError)
+                }
+            } ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@put
             }
