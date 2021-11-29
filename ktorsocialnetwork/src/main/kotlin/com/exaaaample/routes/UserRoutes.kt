@@ -5,14 +5,17 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.data.requests.CreateAccountRequest
 import com.exaaaample.data.requests.LoginRequest
+import com.exaaaample.data.requests.UpdateProfileRequest
 import com.exaaaample.data.responses.AuthResponse
 import com.exaaaample.data.responses.BasicApiResponse
 import com.exaaaample.data.responses.UserResponseItem
+import com.exaaaample.service.PostService
 import com.exaaaample.service.UserService
 import com.exaaaample.util.ApiResponseMessages
 import com.exaaaample.util.ApiResponseMessages.FIELDS_BLANK
 import com.exaaaample.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.exaaaample.util.ApiResponseMessages.USER_ALREADY_EXISTS
+import com.exaaaample.util.Constants
 import com.exaaaample.util.QueryParams
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -138,6 +141,28 @@ fun Route.searchUser(userService: UserService) {
     }
 }
 
+fun Route.getPostsForProfile(
+    postService: PostService,
+) {
+    authenticate {
+        get("/api/user/get") {
+            val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
+            val pageSize =
+                call.parameters[QueryParams.PARAM_PAGE_SIZE]?.toIntOrNull() ?: Constants.DEFAULT_POST_PAGE_SIZE
+
+            val posts = postService.getPostsForProfile(
+                userId = call.userId,
+                page = page,
+                pageSize = pageSize
+            )
+            call.respond(
+                HttpStatusCode.OK,
+                posts
+            )
+        }
+    }
+}
+
 fun Route.getUserProfile(userService: UserService) {
     authenticate {
         get("/api/user/profile") {
@@ -160,6 +185,17 @@ fun Route.getUserProfile(userService: UserService) {
                 HttpStatusCode.OK,
                 profileResponse
             )
+        }
+    }
+}
+
+fun Route.updateUserProfile(userService: UserService) {
+    authenticate {
+        put("/api/user/profile") {
+            val request = call.receiveOrNull<UpdateProfileRequest>() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest)
+                return@put
+            }
         }
     }
 }

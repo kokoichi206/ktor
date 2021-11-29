@@ -30,6 +30,7 @@ fun Application.configureRouting() {
         )
         searchUser(userService)
         getUserProfile(userService)
+        getPostsForProfile(postService)
 
         // Following routes
         followUser(followService, activityService)

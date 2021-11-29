@@ -4,6 +4,7 @@ import com.exaaaample.data.models.User
 import com.exaaaample.data.repository.follow.FollowRepository
 import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.data.requests.CreateAccountRequest
+import com.exaaaample.data.requests.UpdateProfileRequest
 import com.exaaaample.data.responses.ProfileResponse
 import com.exaaaample.data.responses.UserResponseItem
 
@@ -66,6 +67,14 @@ class UserService(
 
     fun isValidPassword(enteredPassword: String, actualPassword: String): Boolean {
         return enteredPassword == actualPassword
+    }
+
+    suspend fun updateUser(
+        userId: String,
+        profileImageUrl: String,
+        updateProfileRequest: UpdateProfileRequest
+    ): Boolean {
+        return userRepository.updateUser(userId, profileImageUrl, updateProfileRequest)
     }
 
     suspend fun searchForUsers(query: String, userId: String): List<UserResponseItem> {
