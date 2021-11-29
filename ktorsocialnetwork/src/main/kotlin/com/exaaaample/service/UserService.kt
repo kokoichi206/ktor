@@ -4,6 +4,7 @@ import com.exaaaample.data.models.User
 import com.exaaaample.data.repository.follow.FollowRepository
 import com.exaaaample.data.repository.user.UserRepository
 import com.exaaaample.data.requests.CreateAccountRequest
+import com.exaaaample.data.responses.ProfileResponse
 import com.exaaaample.data.responses.UserResponseItem
 
 class UserService(
@@ -37,8 +38,26 @@ class UserService(
         return ValidationEvent.Success
     }
 
-    suspend fun doesEmailBelongToUserId(email: String, userId: String): Boolean {
-        return userRepository.doesEmailBelongToUserId(email, userId)
+    suspend fun getUserProfile(userId: String, callerUserId: String): ProfileResponse? {
+        val user = userRepository.getUserById(userId) ?: return null
+        return ProfileResponse(
+            username = user.username,
+            bio = user.bio,
+            followerCount = user.followerCount,
+            followingCount = user.followingCount,
+            postCount = user.postCount,
+            profilePictureUrl = user.profileImageUrl,
+            topSkillUrls = user.skills,
+            gitHubUrl = user.gitHubUrl,
+            instagramUrl = user.instagramUrl,
+            linkedInUrl = user.linkedInUrl,
+            isOwnProfile = userId == callerUserId,
+            isFollowing = if (userId != callerUserId) {
+                followRepository.doesUserFollow(callerUserId, userId)
+            } else {
+                false
+            }
+        )
     }
 
     suspend fun getUserByEmail(email: String): User? {

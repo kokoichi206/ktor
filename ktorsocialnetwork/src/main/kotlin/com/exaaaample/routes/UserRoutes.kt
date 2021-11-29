@@ -9,6 +9,7 @@ import com.exaaaample.data.responses.AuthResponse
 import com.exaaaample.data.responses.BasicApiResponse
 import com.exaaaample.data.responses.UserResponseItem
 import com.exaaaample.service.UserService
+import com.exaaaample.util.ApiResponseMessages
 import com.exaaaample.util.ApiResponseMessages.FIELDS_BLANK
 import com.exaaaample.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.exaaaample.util.ApiResponseMessages.USER_ALREADY_EXISTS
@@ -119,7 +120,7 @@ fun Route.loginUser(
 
 fun Route.searchUser(userService: UserService) {
     authenticate {
-        get {
+        get("/api/user/search") {
             val query = call.parameters[QueryParams.PARAM_QUERY]
             if (query == null || query.isBlank()) {
                 call.respond(
@@ -132,6 +133,32 @@ fun Route.searchUser(userService: UserService) {
             call.respond(
                 HttpStatusCode.OK,
                 searchResults
+            )
+        }
+    }
+}
+
+fun Route.getUserProfile(userService: UserService) {
+    authenticate {
+        get("/api/user/profile") {
+            val userId = call.parameters[QueryParams.PARAM_USER_ID]
+            if (userId == null || userId.isBlank()) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+            val profileResponse = userService.getUserProfile(userId, call.userId)
+            if (profileResponse == null) {
+                call.respond(
+                    HttpStatusCode.OK, BasicApiResponse(
+                        successful = false,
+                        message = ApiResponseMessages.USER_NOT_FOUND
+                    )
+                )
+                return@get
+            }
+            call.respond(
+                HttpStatusCode.OK,
+                profileResponse
             )
         }
     }
