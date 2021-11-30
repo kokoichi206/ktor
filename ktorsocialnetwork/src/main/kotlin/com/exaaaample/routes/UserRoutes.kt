@@ -17,6 +17,7 @@ import com.exaaaample.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.exaaaample.util.ApiResponseMessages.USER_ALREADY_EXISTS
 import com.exaaaample.util.Constants
 import com.exaaaample.util.QueryParams
+import com.exaaaample.util.save
 import com.google.gson.Gson
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -215,10 +216,7 @@ fun Route.updateUserProfile(userService: UserService) {
                         }
                     }
                     is PartData.FileItem -> {
-                        val fileBytes = partData.streamProvider().readBytes()
-                        val fileExtension = partData.originalFileName?.takeLastWhile { it != '.' }
-                        fileName = UUID.randomUUID().toString() + "." + fileExtension
-                        File("${Constants.PROFILE_PICTURE_PATH}${fileName}").writeBytes(fileBytes)
+                        fileName = partData.save(Constants.POST_PICTURE_PATH)
                     }
                     is PartData.BinaryItem -> Unit
                 }
