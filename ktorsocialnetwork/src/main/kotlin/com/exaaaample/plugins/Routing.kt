@@ -46,6 +46,7 @@ fun Application.configureRouting() {
         // Like routes
         likeParent(likeService, activityService)
         unlikeParent(likeService, userService)
+        getLikesForParent(likeService)
 
         // Comment routes
         createComment(commentService, activityService)
@@ -56,8 +57,8 @@ fun Application.configureRouting() {
         getActivities(activityService)
 
         get("/") {
-                call.respondText("Hello World!")
-            }
+            call.respondText("Hello World!")
+        }
         // Static plugin. Try to access `/static/index.html`
         static {
             resources("static")
