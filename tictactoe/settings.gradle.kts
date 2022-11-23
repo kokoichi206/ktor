@@ -1,0 +1,1 @@
+rootProject.name = "jp.mydns.kokoichi0206.tictactoe"
